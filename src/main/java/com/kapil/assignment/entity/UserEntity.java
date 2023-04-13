@@ -2,8 +2,11 @@ package com.kapil.assignment.entity;
 
 import lombok.Data;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * @author Kapil Kaushik
@@ -14,17 +17,21 @@ import javax.persistence.Id;
 
 @Entity
 @Data
-public class UserEntity {
+public class UserEntity implements Serializable {
 
 
     @Id
-    Integer id;
+    Integer accountId;
     String name;
     String email;
     String password;
-    String userId;
     String createdAt;
-
-    Integer following;
-    Integer follower;
+    @ElementCollection
+    ArrayList<Integer> following;
+    @ElementCollection
+    ArrayList<Integer> follower;
+    @ElementCollection
+    ArrayList<Integer> postsLiked;
+    @ElementCollection
+    ArrayList<Integer> posts;
 }
