@@ -1,14 +1,18 @@
 package com.kapil.assignment.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * @author Kapil Kaushik
@@ -21,17 +25,21 @@ import java.util.Map;
 public class PostEntity implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer postId;
     String title;
     String description;
 
-    String createdAt;
-
-    Integer accountId; // who is the owner of this post
+    Date createdAt;
 
     @ElementCollection
-    List<Integer> likes = new ArrayList<>(); // store userid who likes post
+    List<Integer> likes;
 
-    @ElementCollection
-    List<Integer> comments ;
+    @ManyToOne
+    @JoinColumn(name = "posts")
+    UserEntity accountId;
+
+    @OneToMany(mappedBy = "postId")
+    List<CommentEntity> commentId;
+
 }

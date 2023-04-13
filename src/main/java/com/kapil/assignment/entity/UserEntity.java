@@ -1,12 +1,18 @@
 package com.kapil.assignment.entity;
 
-import lombok.Data;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.io.Serializable;
-import java.util.ArrayList;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Kapil Kaushik
@@ -16,22 +22,28 @@ import java.util.ArrayList;
  */
 
 @Entity
-@Data
 public class UserEntity implements Serializable {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer accountId;
     String name;
     String email;
     String password;
-    String createdAt;
+    Date createdAt;
     @ElementCollection
-    ArrayList<Integer> following;
+    List<Integer> following;
     @ElementCollection
-    ArrayList<Integer> follower;
+    List<Integer> follower;
     @ElementCollection
-    ArrayList<Integer> postsLiked;
-    @ElementCollection
-    ArrayList<Integer> posts;
+    List<Integer> postsLiked;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "accountId")
+    List<PostEntity> posts;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "accountId")
+    List<CommentEntity> comments;
+
+
 }
