@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
@@ -32,8 +33,8 @@ public class PostEntity implements Serializable {
 
     Date createdAt;
 
-    @ElementCollection
-    List<Integer> likes;
+    @ManyToMany(mappedBy = "postsLiked",cascade = CascadeType.ALL)
+    List<UserEntity> likes;
 
     @ManyToOne
     @JoinColumn(name = "posts")
