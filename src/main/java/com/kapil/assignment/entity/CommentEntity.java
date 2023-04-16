@@ -1,17 +1,18 @@
 package com.kapil.assignment.entity;
 
-import javafx.geometry.Pos;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Kapil Kaushik
@@ -21,10 +22,13 @@ import java.util.List;
  */
 
 @Entity
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class CommentEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer commentId;
 
     @ManyToOne
@@ -36,4 +40,17 @@ public class CommentEntity implements Serializable {
     PostEntity postId;
 
     String commentMsg;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        CommentEntity that = (CommentEntity) o;
+        return commentId != null && Objects.equals(commentId, that.commentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -1,7 +1,7 @@
 package com.kapil.assignment.config;
 
 import com.kapil.assignment.jwt.JwtAuthFilter;
-import org.apache.catalina.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +32,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthFilter jwtFilter;
 
+    private String[] urls = {
+            "/api/user/login",
+        "/api/user/signup"
+    };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -40,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/user/login")
+                .antMatchers(urls)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
