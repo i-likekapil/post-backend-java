@@ -1,8 +1,11 @@
 package com.kapil.assignment.controller.impl;
 
+import com.kapil.assignment.Model.CommentRequest;
 import com.kapil.assignment.Model.PostRequest;
+import com.kapil.assignment.entity.CommentEntity;
 import com.kapil.assignment.entity.PostEntity;
 import com.kapil.assignment.entity.UserEntity;
+import com.kapil.assignment.repo.CommentRepo;
 import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,9 @@ public class PostControllerImpl {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private CommentRepo commentRepo;
+
 
     @GetMapping("/home")
     public String home() {
@@ -48,22 +54,19 @@ public class PostControllerImpl {
             System.out.println("--------------" + postRequest);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-            //System.out.println("user" + user);
+//            //System.out.println("user" + user);
 
             PostEntity post = new PostEntity();
-            post.setPostId(new Random().nextInt());
             post.setCreatedAt(new Date());
             post.setTitle(postRequest.getTitle());
             post.setDescription(postRequest.getDesc());
+            post.setCommentCount(0);
+            post.setLikeCount(0);
 
-            user.getPosts().add(post);
-
-            post.setAccountId(user);
+            post.setPostedBy(user);
 
 
-            //System.out.println("____post________________" + post);
-            //System.out.println("______user________________" + user);
-            userRepo.save(user);
+            //userRepo.save(user);
             postRepo.save(post);
 
             return post.getPostId().toString();
@@ -83,10 +86,34 @@ public class PostControllerImpl {
         PostEntity post = postRepo.findById(idd).get();
 
 
-        user.getPostsLiked().add(post);
-        post.getLikes().add(user);
-        postRepo.save(post);
-        userRepo.save(user);
+        CommentEntity comment = new CommentEntity();
+
+        comment.setCommentedAt(new Date());
+        comment.setCommentedBy(user);
+        comment.setCommentMsg(null);
+
         return "saved";
     }
+
+
+
+    @PostMapping("/comment/{id}")
+    public String postComment(@PathVariable String id, @RequestBody CommentRequest commentRequest) {
+        int idd = Integer.parseInt(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
+
+
+        CommentEntity comment = new CommentEntity();
+
+        comment.setCommentedAt(new Date());
+        comment.setCommentedOn(new PostEntity(idd));
+        comment.setCommentedBy(user);
+        comment.setCommentMsg(commentRequest.getCommentMsg());
+
+        commentRepo.save(comment);
+
+        return "saved";
+    }
+
 }

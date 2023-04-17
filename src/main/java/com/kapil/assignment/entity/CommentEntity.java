@@ -1,17 +1,28 @@
 package com.kapil.assignment.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,35 +33,29 @@ import java.util.Objects;
  */
 
 @Entity
+@Table(name = "post_comment_rel")
 @Getter
 @Setter
-@ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommentEntity implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentId;
 
-    @ManyToOne
-    @JoinColumn(name = "comments")
-    UserEntity accountId;
 
-    @ManyToOne
-    @JoinColumn(name = "postId")
-    PostEntity postId;
+    @JoinColumn(name = "commented_by",referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    UserEntity commentedBy;
+
+
+    @JoinColumn(name = "Commented_on",referencedColumnName = "postId")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    PostEntity commentedOn;
+
+    Date commentedAt;
 
     String commentMsg;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        CommentEntity that = (CommentEntity) o;
-        return commentId != null && Objects.equals(commentId, that.commentId);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

@@ -1,9 +1,15 @@
 package com.kapil.assignment.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 
@@ -15,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -29,17 +36,32 @@ import java.util.List;
  */
 
 @Entity
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     Integer accountId;
+    @Column(name = "name")
     String name;
+    @Column(name = "email")
     String email;
+    @Column(name = "password")
     String password;
+    @Column(name = "createdAt")
     Date createdAt = new Date();
-    @ElementCollection(fetch = FetchType.EAGER)
+
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "postedBy", fetch = FetchType.LAZY)
+    List<PostEntity> posts;
+
+   /* @ElementCollection(fetch = FetchType.EAGER)
     List<Integer> following = new ArrayList<>();
     @ElementCollection(fetch = FetchType.LAZY)
     List<Integer> follower =new ArrayList<>();
@@ -51,107 +73,6 @@ public class UserEntity implements Serializable {
     List<PostEntity> posts = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "accountId")
-    List<CommentEntity> comments = new ArrayList<>();
+    List<CommentEntity> comments = new ArrayList<>();*/
 
-    @Override
-    public String toString() {
-
-        try {
-            return "UserEntity{" +
-                    "accountId=" + accountId +
-                    ", name='" + name + '\'' +
-                    ", email='" + email + '\'' +
-                    ", password='" + password + '\'' +
-                    ", createdAt=" + createdAt +
-                    ", following=" + following +
-                    ", follower=" + follower +
-                    ", postsLiked=" + postsLiked +
-                    ", posts=" + posts +
-                    ", comments=" + comments +
-                    '}';
-        } catch (Exception e) {
-            System.out.println("aa gyi "+e);
-        }
-        return "hello";
-    }
-
-    public Integer getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Integer accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public List<Integer> getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(List<Integer> following) {
-        this.following = following;
-    }
-
-    public List<Integer> getFollower() {
-        return follower;
-    }
-
-    public void setFollower(List<Integer> follower) {
-        this.follower = follower;
-    }
-
-    public List<PostEntity> getPostsLiked() {
-        return postsLiked;
-    }
-
-    public void setPostsLiked(List<PostEntity> postsLiked) {
-        this.postsLiked = postsLiked;
-    }
-
-    public List<PostEntity> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<PostEntity> posts) {
-        this.posts = posts;
-    }
-
-    public List<CommentEntity> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<CommentEntity> comments) {
-        this.comments = comments;
-    }
 }

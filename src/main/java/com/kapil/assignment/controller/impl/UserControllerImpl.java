@@ -3,6 +3,7 @@ package com.kapil.assignment.controller.impl;
 import com.kapil.assignment.Model.JwtRequest;
 import com.kapil.assignment.config.CustomUserDetailsService;
 import com.kapil.assignment.controller.UserController;
+import com.kapil.assignment.entity.PostEntity;
 import com.kapil.assignment.entity.UserEntity;
 import com.kapil.assignment.jwt.JwtUtil;
 import com.kapil.assignment.repo.UserRepo;
@@ -61,6 +62,22 @@ public class UserControllerImpl/* implements UserController */ {
     }
 
 
+    @GetMapping("/posts")
+    public String getAllPosts(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
+
+        List<PostEntity> posts = user.getPosts();
+        for(PostEntity post:posts) System.out.println(post.getPostId());
+        System.out.println("posts"+ posts);
+
+       /* Integer.parseInt("10");
+        Integer.valueOf("10");*/
+
+        return posts.size()+"";
+    }
+
+
     @PostMapping("/login")
     public String loginUser(@RequestBody JwtRequest jwtRequest) throws Exception {
         System.out.println("login : " + jwtRequest);
@@ -79,7 +96,7 @@ public class UserControllerImpl/* implements UserController */ {
         System.out.println("token " + token);
         return token;
     }
-
+/*
     @PostMapping("/follow/{id}")
     public String follow(@PathVariable String id) {
 
@@ -115,6 +132,6 @@ public class UserControllerImpl/* implements UserController */ {
         System.out.println("auth " + auth.getName());
         return userRepo.findUserEntitiesByEmail(auth.getName());
     }
-
+*/
 
 }

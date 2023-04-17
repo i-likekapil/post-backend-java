@@ -40,6 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }catch (Exception e){
             System.out.println("userservice m h error"+e);
         }
+        System.out.println("before check "+userEntity);
         if(username.equals(userEntity.getEmail())){
             return new User(username,userEntity.getPassword(),new ArrayList<>());
         }
