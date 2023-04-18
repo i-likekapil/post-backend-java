@@ -13,8 +13,11 @@ import com.kapil.assignment.repo.CommentRepo;
 import com.kapil.assignment.repo.LikeRepo;
 import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.repo.UserRepo;
+import com.kapil.assignment.services.PostService;
 import com.kapil.assignment.services.PostUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 /**
  * @author Kapil Kaushik
@@ -57,6 +57,9 @@ public class PostControllerImpl {
     @Autowired
     private PostUtil postUtil;
 
+    @Autowired
+    private PostService postService;
+
 
     @GetMapping("/home")
     public String home() {
@@ -64,61 +67,32 @@ public class PostControllerImpl {
     }
 
     @PostMapping("/post")
-    public NewPost createPost(@RequestBody PostRequest postRequest) {
-        try {
-            System.out.println("--------------" + postRequest);
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-
-            PostEntity post = new PostEntity();
-            post.setCreatedAt(new Date());
-            post.setTitle(postRequest.getTitle());
-            post.setDescription(postRequest.getDesc());
-            post.setCommentCount(0);
-            post.setLikeCount(0);
-            post.setPostedBy(user);
-
-            postRepo.save(post);
-
-            return new NewPost(post.getPostId(),
-                    post.getTitle(),
-                    post.getDescription(),
-                    post.getCreatedAt()
-            );
-
-        } catch (Exception e) {
-
-            return new NewPost();
-        }
-    }
-
-    @PostMapping("/like/{id}")
-    public String postLike(@PathVariable String id) {
-        int postId = Integer.parseInt(id);
+    public ResponseEntity<NewPost> createPost(@RequestBody PostRequest postRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-        boolean isExists = likeRepo.existsByLikedBy_AccountIdAndLikedOn_PostId(user.getAccountId(), postId);
-        boolean isPostExists = postRepo.existsByPostId(postId);
-        System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
-        if (isPostExists) {
-            if (!isExists) {
-                PostLikeEntity likeEntity = new PostLikeEntity();
-                likeEntity.setLikedOn(new PostEntity(postId));
-                likeEntity.setLikedBy(new UserEntity(user.getAccountId()));
-                likeEntity.setLikedAt(new Date());
-                likeEntity.setLiked_or_disliked(true);
+        if (postRequest.getTitle() != null && postRequest.getDesc() != null)
+            return new ResponseEntity<>(postService.createPost(
+                    postRequest.getTitle(),
+                    postRequest.getDesc(),
+                    user
+            ), HttpStatus.OK);
 
-                System.out.println(likeEntity);
+        return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
+    }
 
-                likeRepo.save(likeEntity);
-                return "Post is liked by " + user.getEmail() + " ...";
-            } else {
-                return "Post is already liked by " + user.getEmail() + " ...";
-            }
-        } else {
-            return "Post is not found by " + postId + " ,Please check post id.";
-        }
+    @PostMapping("/like/{postId}")
+    public HttpStatus postLike(@PathVariable Integer postId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
 
+        if (!postService.isPostExists(postId))
+            return HttpStatus.NOT_FOUND;
+
+        PostLikeEntity postLike = postService.likePostByUser(postId, user.getAccountId());
+        if (postLike == null)
+            return HttpStatus.NOT_MODIFIED;
+
+        return HttpStatus.OK;
     }
 
     @PostMapping("/unlike/{id}")
@@ -159,7 +133,7 @@ public class PostControllerImpl {
             comment.setCommentedBy(user);
             comment.setCommentMsg(commentRequest.getCommentMsg());
             commentRepo.save(comment);
-            return comment.getCommentId()+"";
+            return comment.getCommentId() + "";
         }
         return "-1"; // change status code also with error
     }
@@ -173,7 +147,7 @@ public class PostControllerImpl {
             System.out.println("post " + post);
             List<CommentEntity> commented = commentRepo.findByCommentedOn(post);
             System.out.println(" commented " + commented);
-            return new PostById(post.getLikeCount(),postUtil.getAllCommentsByPostId(id));
+            return new PostById(post.getLikeCount(), postUtil.getAllCommentsByPostId(id));
         }
 
         return new PostById();

@@ -58,4 +58,10 @@ public class PostLikeEntity implements Serializable {
 
     Boolean liked_or_disliked;
 
+    public PostLikeEntity(PostEntity postEntity, UserEntity userEntity, Date likedAt, boolean isLiked) {
+        this.likedOn = postEntity;
+        this.likedBy = userEntity;
+        this.likedAt = likedAt;
+        liked_or_disliked = isLiked;
+    }
 }

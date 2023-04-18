@@ -62,4 +62,11 @@ public class PostEntity implements Serializable {
         this.setPostId(id);
     }
 
+    public PostEntity(String title, String desc, Date createdAt, int likeCount, int commentCount) {
+        this.title = title;
+        this.description = desc;
+        this.createdAt = createdAt;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
+    }
 }
