@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author Kapil Kaushik
  * @project post-backend-java
@@ -19,8 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface LikeRepo extends JpaRepository<PostLikeEntity, Integer> {
+    @Transactional
+    @Modifying
+    @Query("delete from PostLikeEntity p where p.likedBy = ?1 and p.likedOn = ?2")
+    int deleteByLikedByAndLikedOn(UserEntity likedBy, PostEntity likedOn);
+
+    List<PostLikeEntity> findByLikedBy_AccountIdAndLikedOn_PostId(Integer accountId, Integer postId);
+
+
     @Query("select (count(p) > 0) from PostLikeEntity p where p.likedBy.accountId = ?1 and p.likedOn.postId = ?2")
     boolean existsByLikedBy_AccountIdAndLikedOn_PostId(Integer accountId, Integer postId);
+
+
     @Transactional
     @Modifying
     @Query("update PostLikeEntity p set p.liked_or_disliked = ?1 where p.likedBy = ?2 and p.likedOn = ?3")

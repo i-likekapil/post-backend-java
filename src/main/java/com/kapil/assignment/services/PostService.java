@@ -20,4 +20,5 @@ public interface PostService {
     boolean isPostAlreadyLikedByUser(int postId, int accountId);
 
     PostLikeEntity likePostByUser(int postId, int accountId);
+    int unLikePostByUser(int postId, int accountId);
 }

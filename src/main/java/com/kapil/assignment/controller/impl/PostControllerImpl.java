@@ -96,27 +96,12 @@ public class PostControllerImpl {
     }
 
     @PostMapping("/unlike/{id}")
-    public String unLikePost(@PathVariable String id) {
-        int postId = Integer.parseInt(id);
+    public HttpStatus unLikePost(@PathVariable Integer id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-
-        boolean isExists = likeRepo.existsByLikedBy_AccountIdAndLikedOn_PostId(user.getAccountId(), postId);
-
-        int result = -1;
-        boolean isPostExists = postRepo.existsByPostId(postId);
-        System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
-        if (isPostExists) {
-            if (isExists) {
-                result = likeRepo.updateLiked_or_dislikedByLikedByAndLikedOn(false, user, new PostEntity(postId));
-            } else {
-                // post is not liked by this user
-            }
-            return "unliked " + isExists + " .. " + result + "...";
-        } else {
-            // post not exists
-        }
-        return "";
+        int res = postService.unLikePostByUser(id, user.getAccountId());
+        if (res == -1) return HttpStatus.NOT_FOUND;
+        return HttpStatus.OK;
     }
 
     @PostMapping("/comment/{id}")

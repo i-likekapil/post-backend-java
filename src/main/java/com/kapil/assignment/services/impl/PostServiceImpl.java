@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Kapil Kaushik
@@ -57,5 +58,13 @@ public class PostServiceImpl implements PostService {
         likeRepo.save(likeEntity);
 
         return likeEntity;
+    }
+
+
+    @Override
+    public int unLikePostByUser(int postId, int accountId) {
+        if (!isPostAlreadyLikedByUser(postId,accountId)) return -1;
+        // post is liked by user now unlike
+        return likeRepo.deleteByLikedByAndLikedOn(new UserEntity(accountId), new PostEntity(postId));
     }
 }
