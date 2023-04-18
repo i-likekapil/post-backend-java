@@ -2,6 +2,7 @@ package com.kapil.assignment.controller.impl;
 
 import com.kapil.assignment.Model.CommentRequest;
 import com.kapil.assignment.Model.PostRequest;
+import com.kapil.assignment.dto.NewPost;
 import com.kapil.assignment.dto.PostById;
 import com.kapil.assignment.dto.UserPosts;
 import com.kapil.assignment.entity.CommentEntity;
@@ -12,6 +13,7 @@ import com.kapil.assignment.repo.CommentRepo;
 import com.kapil.assignment.repo.LikeRepo;
 import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.repo.UserRepo;
+import com.kapil.assignment.services.PostUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,6 +54,9 @@ public class PostControllerImpl {
     @Autowired
     private LikeRepo likeRepo;
 
+    @Autowired
+    private PostUtil postUtil;
+
 
     @GetMapping("/home")
     public String home() {
@@ -59,12 +64,11 @@ public class PostControllerImpl {
     }
 
     @PostMapping("/post")
-    public String createPost(@RequestBody PostRequest postRequest) {
+    public NewPost createPost(@RequestBody PostRequest postRequest) {
         try {
             System.out.println("--------------" + postRequest);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-//            //System.out.println("user" + user);
 
             PostEntity post = new PostEntity();
             post.setCreatedAt(new Date());
@@ -72,18 +76,19 @@ public class PostControllerImpl {
             post.setDescription(postRequest.getDesc());
             post.setCommentCount(0);
             post.setLikeCount(0);
-
             post.setPostedBy(user);
 
-
-            //userRepo.save(user);
             postRepo.save(post);
 
-            return post.getPostId().toString();
+            return new NewPost(post.getPostId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getCreatedAt()
+            );
 
         } catch (Exception e) {
-            System.out.println(e);
-            return "error";
+
+            return new NewPost();
         }
     }
 
@@ -154,65 +159,43 @@ public class PostControllerImpl {
             comment.setCommentedBy(user);
             comment.setCommentMsg(commentRequest.getCommentMsg());
             commentRepo.save(comment);
-            return "comment added to post " + postId + " by " + user.getAccountId() + " ...";
+            return comment.getCommentId()+"";
         }
-        return "Post is not found by " + postId + " ,Please check post id.";
+        return "-1"; // change status code also with error
     }
 
     @GetMapping("/posts/{id}")
     public PostById getPostById(@PathVariable Integer id) {
-        PostById postById = new PostById();
         boolean isPostExists = postRepo.existsByPostId(id);
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
         if (isPostExists) {
             PostEntity post = postRepo.findById(id).get();
-            System.out.println("post "+post);
+            System.out.println("post " + post);
             List<CommentEntity> commented = commentRepo.findByCommentedOn(post);
-            System.out.println(" commented "+commented);
-            List<String> msg = new ArrayList<>();
-            if (post != null) {
-                postById.setLikes(post.getLikeCount());
-                for(CommentEntity c : commented) msg.add(c.getCommentMsg());
-                postById.setComments(msg);
-            }
-            return postById;
+            System.out.println(" commented " + commented);
+            return new PostById(post.getLikeCount(),postUtil.getAllCommentsByPostId(id));
         }
 
         return new PostById();
     }
 
     @GetMapping("/all_posts")
-    public List<UserPosts> getAllPostsByAuthUser(){
+    public List<UserPosts> getAllPostsByAuthUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
         int userid = user.getAccountId();
         List<PostEntity> allPosts = postRepo.findAll();
-        System.out.println("all posts "+ allPosts);
+        System.out.println("all posts " + allPosts);
         List<UserPosts> posts = new ArrayList<>();
 
-        for (PostEntity post : allPosts){
-            if(post.getPostedBy().getAccountId() == userid){
+        for (PostEntity post : allPosts) {
+            if (post.getPostedBy().getAccountId() == userid) {
                 posts.add(new UserPosts(post.getPostId(),
-                        post.getTitle(),post.getDescription(),post.getCreatedAt(),
-                        post.getLikeCount(),getAllCommentsByPostId(post.getPostId())));
+                        post.getTitle(), post.getDescription(), post.getCreatedAt(),
+                        post.getLikeCount(), postUtil.getAllCommentsByPostId(post.getPostId())));
             }
         }
-        System.out.println("posts "+ posts);
+        System.out.println("posts " + posts);
         return posts;
-    }
-
-    private List<String> getAllCommentsByPostId(int id){
-        boolean isPostExists = postRepo.existsByPostId(id);
-        System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
-        List<String> msg = new ArrayList<>();
-        if (isPostExists) {
-            PostEntity post = postRepo.findById(id).get();
-            List<CommentEntity> commented = commentRepo.findByCommentedOn(post);
-            if (post != null) {
-                for(CommentEntity c : commented) msg.add(c.getCommentMsg());
-            }
-        }
-        System.out.println("before return getAllCommentsByPostId "+ msg);
-        return msg;
     }
 }
