@@ -82,17 +82,10 @@ public class PostControllerImpl {
         int idd = Integer.parseInt(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
+        //TODO: like a post from post id.
 
-        PostEntity post = postRepo.findById(idd).get();
 
-
-        CommentEntity comment = new CommentEntity();
-
-        comment.setCommentedAt(new Date());
-        comment.setCommentedBy(user);
-        comment.setCommentMsg(null);
-
-        return "saved";
+        return "liked";
     }
 
 

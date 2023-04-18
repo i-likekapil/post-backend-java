@@ -2,15 +2,12 @@ package com.kapil.assignment.controller.impl;
 
 import com.kapil.assignment.Model.JwtRequest;
 import com.kapil.assignment.config.CustomUserDetailsService;
-import com.kapil.assignment.controller.UserController;
+import com.kapil.assignment.dto.UserPosts;
 import com.kapil.assignment.entity.PostEntity;
 import com.kapil.assignment.entity.UserEntity;
 import com.kapil.assignment.jwt.JwtUtil;
 import com.kapil.assignment.repo.UserRepo;
-import org.hibernate.query.criteria.internal.predicate.PredicateImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.CustomAutowireConfigurer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,8 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,18 +59,23 @@ public class UserControllerImpl/* implements UserController */ {
 
 
     @GetMapping("/posts")
-    public String getAllPosts(){
+    public List<UserPosts> getAllPosts() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-
+        List<UserPosts> allUserPostList = new ArrayList<>();
         List<PostEntity> posts = user.getPosts();
-        for(PostEntity post:posts) System.out.println(post.getPostId());
-        System.out.println("posts"+ posts);
-
-       /* Integer.parseInt("10");
-        Integer.valueOf("10");*/
-
-        return posts.size()+"";
+        for (PostEntity post : posts) {
+            System.out.println(post.getPostId());
+            System.out.println("posts" + posts);
+            allUserPostList.add(new UserPosts(
+                    post.getPostId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getCreatedAt(),
+                    post.getLikeCount(),
+                    post.getCommentCount()));
+        }
+        return allUserPostList;
     }
 
 
