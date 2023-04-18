@@ -5,6 +5,8 @@ import com.kapil.assignment.entity.PostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author Kapil Kaushik
  * @project post-backend-java
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepo extends JpaRepository<CommentEntity, Integer> {
+    List<CommentEntity> findByCommentedOn(PostEntity commentedOn);
 
 
 }

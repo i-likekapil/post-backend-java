@@ -38,6 +38,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class CommentEntity implements Serializable {
 
     @Id

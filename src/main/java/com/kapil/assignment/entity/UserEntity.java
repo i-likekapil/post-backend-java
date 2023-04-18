@@ -61,6 +61,10 @@ public class UserEntity implements Serializable {
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "postedBy", fetch = FetchType.LAZY)
     List<PostEntity> posts;
 
+    public UserEntity(Integer accountId) {
+        this.setAccountId(accountId);
+    }
+
    /* @ElementCollection(fetch = FetchType.EAGER)
     List<Integer> following = new ArrayList<>();
     @ElementCollection(fetch = FetchType.LAZY)

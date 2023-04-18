@@ -73,7 +73,7 @@ public class UserControllerImpl/* implements UserController */ {
                     post.getDescription(),
                     post.getCreatedAt(),
                     post.getLikeCount(),
-                    post.getCommentCount()));
+                    null));
         }
         return allUserPostList;
     }

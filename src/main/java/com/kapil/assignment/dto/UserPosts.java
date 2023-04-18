@@ -3,6 +3,7 @@ package com.kapil.assignment.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
@@ -17,12 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class UserPosts {
 
-    private Integer postId;
-    private String postTitle;
-    private String postDesc;
-    private Date postedOn;
+    private Integer id;
+    private String title;
+    private String desc;
+    private Date created_At;
     private Integer likes;
-    private Integer comments;
+    private List<String> comments;
 }
