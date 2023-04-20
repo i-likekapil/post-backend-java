@@ -21,6 +21,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostById {
+
+    Integer postId;
     Integer likes;
     List<String> comments;
 }

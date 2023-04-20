@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author Kapil Kaushik
  * @project post-backend-java
@@ -18,6 +20,11 @@ import org.springframework.stereotype.Service;
 public interface PostRepo extends JpaRepository<PostEntity, Integer> {
     @Query("select (count(p) > 0) from PostEntity p where p.postId = ?1")
     boolean existsByPostId(Integer postId);
+
+    @Query("select p from PostEntity p where p.postedBy.accountId = ?1")
+    List<PostEntity> findByPostedBy_AccountId(Integer accountId);
+
+
 
 
 }

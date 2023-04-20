@@ -1,6 +1,8 @@
 package com.kapil.assignment.services.impl;
 
 import com.kapil.assignment.dto.NewPost;
+import com.kapil.assignment.dto.PostById;
+import com.kapil.assignment.dto.UserPosts;
 import com.kapil.assignment.entity.CommentEntity;
 import com.kapil.assignment.entity.PostEntity;
 import com.kapil.assignment.entity.PostLikeEntity;
@@ -9,11 +11,14 @@ import com.kapil.assignment.repo.CommentRepo;
 import com.kapil.assignment.repo.LikeRepo;
 import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.services.PostService;
+import com.kapil.assignment.services.PostUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Kapil Kaushik
@@ -32,6 +37,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private CommentRepo commentRepo;
+
+    @Autowired
+    private PostUtil postUtil;
 
     @Override
     public NewPost createPost(String title, String desc, UserEntity user) {
@@ -80,5 +88,31 @@ public class PostServiceImpl implements PostService {
         );
         commentRepo.save(comment);
         return comment.getCommentId();
+    }
+
+    @Override
+    public PostById getAllCommentsAndLikesByPostId(int postId) {
+        Optional<PostEntity> postEntity = postRepo.findById(postId);
+        if (postEntity.isPresent()) {
+            PostEntity post = postEntity.get();
+            List<CommentEntity> comments = commentRepo.findByCommentedOn(post);
+            new PostById(postId,post.getLikeCount(), postUtil.getAllCommentsByPostId(postId));
+
+        }
+        return null;
+    }
+
+    @Override
+    public List<UserPosts> getAllPostsByAccountId(int accountId) {
+        List<PostEntity> allPosts = postRepo.findByPostedBy_AccountId(accountId);
+        System.out.println("all posts " + allPosts);
+        List<UserPosts> posts = new ArrayList<>();
+        for (PostEntity post : allPosts) {
+                posts.add(new UserPosts(post.getPostId(),
+                        post.getTitle(), post.getDescription(), post.getCreatedAt(),
+                        post.getLikeCount(), postUtil.getAllCommentsByPostId(post.getPostId())));
+
+        }
+        return posts;
     }
 }

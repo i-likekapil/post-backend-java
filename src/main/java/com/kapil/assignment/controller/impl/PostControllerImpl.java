@@ -112,41 +112,25 @@ public class PostControllerImpl {
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
         if (isPostExists)
             return new ResponseEntity<>(postService.commentPostById(postId, user.getAccountId(), commentRequest.getCommentMsg()), HttpStatus.ACCEPTED);
-        return new ResponseEntity<>(-1, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/posts/{id}")
-    public PostById getPostById(@PathVariable Integer id) {
+    public ResponseEntity<PostById> getPostById(@PathVariable Integer id) {
         boolean isPostExists = postRepo.existsByPostId(id);
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
-        if (isPostExists) {
-            PostEntity post = postRepo.findById(id).get();
-            System.out.println("post " + post);
-            List<CommentEntity> commented = commentRepo.findByCommentedOn(post);
-            System.out.println(" commented " + commented);
-            return new PostById(post.getLikeCount(), postUtil.getAllCommentsByPostId(id));
-        }
-
-        return new PostById();
+        if (isPostExists)
+            return new ResponseEntity<>(postService.getAllCommentsAndLikesByPostId(id),HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/all_posts")
-    public List<UserPosts> getAllPostsByAuthUser() {
+    public ResponseEntity<List<UserPosts>> getAllPostsByAuthUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-        int userid = user.getAccountId();
-        List<PostEntity> allPosts = postRepo.findAll();
-        System.out.println("all posts " + allPosts);
-        List<UserPosts> posts = new ArrayList<>();
-
-        for (PostEntity post : allPosts) {
-            if (post.getPostedBy().getAccountId() == userid) {
-                posts.add(new UserPosts(post.getPostId(),
-                        post.getTitle(), post.getDescription(), post.getCreatedAt(),
-                        post.getLikeCount(), postUtil.getAllCommentsByPostId(post.getPostId())));
-            }
-        }
-        System.out.println("posts " + posts);
-        return posts;
+        List<UserPosts> allPostsByAccountId = postService.getAllPostsByAccountId(user.getAccountId());
+        System.out.println("aa gyi sari posts " + allPostsByAccountId);
+        if (allPostsByAccountId.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(allPostsByAccountId, HttpStatus.OK);
     }
 }

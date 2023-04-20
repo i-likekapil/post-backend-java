@@ -1,8 +1,12 @@
 package com.kapil.assignment.services;
 
 import com.kapil.assignment.dto.NewPost;
+import com.kapil.assignment.dto.PostById;
+import com.kapil.assignment.dto.UserPosts;
 import com.kapil.assignment.entity.PostLikeEntity;
 import com.kapil.assignment.entity.UserEntity;
+
+import java.util.List;
 
 /**
  * @author Kapil Kaushik
@@ -23,4 +27,8 @@ public interface PostService {
     int unLikePostByUser(int postId, int accountId);
 
     int commentPostById(int postId, int accountId, String commentMsg);
+
+    PostById getAllCommentsAndLikesByPostId(int postId);
+
+    List<UserPosts> getAllPostsByAccountId(int accountId);
 }
