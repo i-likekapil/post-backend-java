@@ -104,23 +104,15 @@ public class PostControllerImpl {
         return HttpStatus.OK;
     }
 
-    @PostMapping("/comment/{id}")
-    public String postComment(@PathVariable String id, @RequestBody CommentRequest commentRequest) {
-        int postId = Integer.parseInt(id);
+    @PostMapping("/comment/{postId}")
+    public ResponseEntity<Integer> postComment(@PathVariable int postId, @RequestBody CommentRequest commentRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
         boolean isPostExists = postRepo.existsByPostId(postId);
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
-        if (isPostExists) {
-            CommentEntity comment = new CommentEntity();
-            comment.setCommentedAt(new Date());
-            comment.setCommentedOn(new PostEntity(postId));
-            comment.setCommentedBy(user);
-            comment.setCommentMsg(commentRequest.getCommentMsg());
-            commentRepo.save(comment);
-            return comment.getCommentId() + "";
-        }
-        return "-1"; // change status code also with error
+        if (isPostExists)
+            return new ResponseEntity<>(postService.commentPostById(postId, user.getAccountId(), commentRequest.getCommentMsg()), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(-1, HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/posts/{id}")

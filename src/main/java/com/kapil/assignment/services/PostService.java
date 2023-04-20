@@ -21,4 +21,6 @@ public interface PostService {
 
     PostLikeEntity likePostByUser(int postId, int accountId);
     int unLikePostByUser(int postId, int accountId);
+
+    int commentPostById(int postId, int accountId, String commentMsg);
 }

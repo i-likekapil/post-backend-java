@@ -1,9 +1,11 @@
 package com.kapil.assignment.services.impl;
 
 import com.kapil.assignment.dto.NewPost;
+import com.kapil.assignment.entity.CommentEntity;
 import com.kapil.assignment.entity.PostEntity;
 import com.kapil.assignment.entity.PostLikeEntity;
 import com.kapil.assignment.entity.UserEntity;
+import com.kapil.assignment.repo.CommentRepo;
 import com.kapil.assignment.repo.LikeRepo;
 import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.services.PostService;
@@ -27,6 +29,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private LikeRepo likeRepo;
+
+    @Autowired
+    private CommentRepo commentRepo;
 
     @Override
     public NewPost createPost(String title, String desc, UserEntity user) {
@@ -66,5 +71,14 @@ public class PostServiceImpl implements PostService {
         if (!isPostAlreadyLikedByUser(postId,accountId)) return -1;
         // post is liked by user now unlike
         return likeRepo.deleteByLikedByAndLikedOn(new UserEntity(accountId), new PostEntity(postId));
+    }
+
+    @Override
+    public int commentPostById(int postId, int accountId, String commentMsg) {
+        CommentEntity comment = new CommentEntity(
+                new Date(), new PostEntity(postId), new UserEntity(accountId), commentMsg
+        );
+        commentRepo.save(comment);
+        return comment.getCommentId();
     }
 }

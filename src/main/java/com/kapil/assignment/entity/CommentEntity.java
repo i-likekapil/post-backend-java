@@ -46,12 +46,12 @@ public class CommentEntity implements Serializable {
     Integer commentId;
 
 
-    @JoinColumn(name = "commented_by",referencedColumnName = "id")
+    @JoinColumn(name = "commented_by", referencedColumnName = "id")
     @OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     UserEntity commentedBy;
 
 
-    @JoinColumn(name = "Commented_on",referencedColumnName = "postId")
+    @JoinColumn(name = "Commented_on", referencedColumnName = "postId")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     PostEntity commentedOn;
 
@@ -59,4 +59,11 @@ public class CommentEntity implements Serializable {
 
     String commentMsg;
 
+    public CommentEntity(Date commentedAt, PostEntity commentedOn, UserEntity commentedBy, String commentMsg) {
+        this.commentedAt = commentedAt;
+        this.commentedOn = commentedOn;
+        this.commentedBy = commentedBy;
+        this.commentMsg = commentMsg;
+
+    }
 }
