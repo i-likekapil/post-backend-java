@@ -5,16 +5,11 @@ import com.kapil.assignment.Model.PostRequest;
 import com.kapil.assignment.dto.NewPost;
 import com.kapil.assignment.dto.PostById;
 import com.kapil.assignment.dto.UserPosts;
-import com.kapil.assignment.entity.CommentEntity;
-import com.kapil.assignment.entity.PostEntity;
 import com.kapil.assignment.entity.PostLikeEntity;
 import com.kapil.assignment.entity.UserEntity;
-import com.kapil.assignment.repo.CommentRepo;
-import com.kapil.assignment.repo.LikeRepo;
 import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.repo.UserRepo;
 import com.kapil.assignment.services.PostService;
-import com.kapil.assignment.services.PostUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,15 +40,6 @@ public class PostControllerImpl {
 
     @Autowired
     private UserRepo userRepo;
-
-    @Autowired
-    private CommentRepo commentRepo;
-
-    @Autowired
-    private LikeRepo likeRepo;
-
-    @Autowired
-    private PostUtil postUtil;
 
     @Autowired
     private PostService postService;
@@ -120,7 +104,7 @@ public class PostControllerImpl {
         boolean isPostExists = postRepo.existsByPostId(id);
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
         if (isPostExists)
-            return new ResponseEntity<>(postService.getAllCommentsAndLikesByPostId(id),HttpStatus.OK);
+            return new ResponseEntity<>(postService.getAllCommentsAndLikesByPostId(id), HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
