@@ -95,7 +95,6 @@ public class PostServiceImpl implements PostService {
         Optional<PostEntity> postEntity = postRepo.findById(postId);
         if (postEntity.isPresent()) {
             PostEntity post = postEntity.get();
-            List<CommentEntity> comments = commentRepo.findByCommentedOn(post);
             new PostById(postId,post.getLikeCount(), postUtil.getAllCommentsByPostId(postId));
 
         }
@@ -114,5 +113,18 @@ public class PostServiceImpl implements PostService {
 
         }
         return posts;
+    }
+
+    @Override
+    public boolean deleteUserPostById(int accountId, int postId) {
+        boolean isPostExists = isPostExists(postId);
+        System.out.println("isPostExists " + isPostExists);
+        if (!isPostExists) return false;
+        boolean isUserCreatePost = postRepo.existsByPostedBy_AccountIdAndPostId(accountId, postId);
+        System.out.println("isUserCreatePost " + isUserCreatePost);
+        if (!isUserCreatePost) return false;
+        int result = postRepo.deleteByPostIdAndPostedBy(postId, accountId);
+        System.out.println("ho gyi delete " + result);
+        return true;
     }
 }

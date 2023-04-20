@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -113,5 +114,16 @@ public class PostControllerImpl {
         System.out.println("aa gyi sari posts " + allPostsByAccountId);
         if (allPostsByAccountId.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(allPostsByAccountId, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public HttpStatus deletePost(@PathVariable Integer postId){
+        if(postService.isPostExists(postId)){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
+            boolean result = postService.deleteUserPostById(user.getAccountId(), postId);
+            if(result) return HttpStatus.ACCEPTED;
+        }
+        return HttpStatus.BAD_REQUEST;
     }
 }

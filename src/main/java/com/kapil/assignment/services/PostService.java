@@ -31,4 +31,6 @@ public interface PostService {
     PostById getAllCommentsAndLikesByPostId(int postId);
 
     List<UserPosts> getAllPostsByAccountId(int accountId);
+
+    boolean deleteUserPostById(int accountId, int postId);
 }
