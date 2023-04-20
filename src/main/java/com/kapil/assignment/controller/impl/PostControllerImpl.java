@@ -7,10 +7,8 @@ import com.kapil.assignment.dto.PostById;
 import com.kapil.assignment.dto.UserPosts;
 import com.kapil.assignment.entity.PostLikeEntity;
 import com.kapil.assignment.entity.UserEntity;
-import com.kapil.assignment.repo.PostRepo;
 import com.kapil.assignment.repo.UserRepo;
 import com.kapil.assignment.services.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,15 +33,14 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostControllerImpl {
 
-    @Autowired
-    private PostRepo postRepo;
+    private final UserRepo userRepo;
 
-    @Autowired
-    private UserRepo userRepo;
+    private final PostService postService;
 
-    @Autowired
-    private PostService postService;
-
+    public PostControllerImpl(UserRepo userRepo, PostService postService) {
+        this.userRepo = userRepo;
+        this.postService = postService;
+    }
 
     @GetMapping("/home")
     public String home() {
@@ -92,7 +89,7 @@ public class PostControllerImpl {
     public ResponseEntity<Integer> postComment(@PathVariable int postId, @RequestBody CommentRequest commentRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity user = userRepo.findUserEntitiesByEmail(auth.getName());
-        boolean isPostExists = postRepo.existsByPostId(postId);
+        boolean isPostExists = postService.isPostExists(postId);
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
         if (isPostExists)
             return new ResponseEntity<>(postService.commentPostById(postId, user.getAccountId(), commentRequest.getCommentMsg()), HttpStatus.ACCEPTED);
@@ -101,7 +98,7 @@ public class PostControllerImpl {
 
     @GetMapping("/posts/{id}")
     public ResponseEntity<PostById> getPostById(@PathVariable Integer id) {
-        boolean isPostExists = postRepo.existsByPostId(id);
+        boolean isPostExists = postService.isPostExists(id);
         System.out.println("post dekh le bhai hai ya nhi " + isPostExists);
         if (isPostExists)
             return new ResponseEntity<>(postService.getAllCommentsAndLikesByPostId(id), HttpStatus.OK);
